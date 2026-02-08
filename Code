@@ -1,56 +1,81 @@
-#include <Servo.h>
+#include <Servo.h> 
+// Inclusion de la bibliothèque Servo pour piloter les servomoteurs
 
-int P1tPin = A5;
-int P2tPin = A4;
-int P3tPin = A3;
-int Button1Pin = 2;
-int Button2Pin = 3;
-int MotorINApin = 5;
-int MotorINBpin = 6;
-Servo m1servo;
-Servo m2servo;
-Servo m3servo;
-int v1l;
-int v2l;
-int v3l;
+// === Définition des broches ===
 
+// Broches des potentiomètres (entrées analogiques)
+int P1tPin = A5;   // Potentiomètre n°1
+int P2tPin = A4;   // Potentiomètre n°2
+int P3tPin = A3;   // Potentiomètre n°3
+
+// Broches des boutons poussoirs (entrées numériques)
+int Button1Pin = 2;  // Bouton n°1 (sens 1 du moteur DC)
+int Button2Pin = 3;  // Bouton n°2 (sens 2 du moteur DC)
+
+// Broches du driver du moteur DC (sorties PWM)
+int MotorINApin = 5; // Entrée IN1 du driver moteur
+int MotorINBpin = 6; // Entrée IN2 du driver moteur
+
+// === Déclaration des servomoteurs ===
+Servo m1servo;   // Servomoteur n°1
+Servo m2servo;   // Servomoteur n°2
+Servo m3servo;   // Servomoteur n°3
+
+// === Variables pour stocker les valeurs des potentiomètres ===
+int v1l; // Valeur du potentiomètre n°1
+int v2l; // Valeur du potentiomètre n°2
+int v3l; // Valeur du potentiomètre n°3
 
 void setup() {
-  // put your setup code here, to run once:
-  pinMode(Button1Pin,INPUT_PULLUP);
-  pinMode(Button2Pin,INPUT_PULLUP);
-  pinMode(MotorINApin,OUTPUT);
-  pinMode(MotorINBpin,OUTPUT);
+  // Configuration des boutons en entrée avec résistance de pull-up interne
+  // (LOW quand le bouton est appuyé)
+  pinMode(Button1Pin, INPUT_PULLUP);
+  pinMode(Button2Pin, INPUT_PULLUP);
+
+  // Configuration des broches du moteur DC en sortie
+  pinMode(MotorINApin, OUTPUT);
+  pinMode(MotorINBpin, OUTPUT);
+
+  // Association des servomoteurs à leurs broches PWM
   m1servo.attach(9);
   m2servo.attach(11);
   m3servo.attach(10);
 }
 
 void loop() {
-  
-  v1l = analogRead(P1tPin);
-  v1l = map(v1l, 0, 1023, 0, 180);
-  m1servo.write(v1l);
 
+  // === Lecture et commande du servomoteur 1 ===
+  v1l = analogRead(P1tPin);           // Lecture du potentiomètre (0 à 1023)
+  v1l = map(v1l, 0, 1023, 0, 180);    // Conversion en angle (0 à 180°)
+  m1servo.write(v1l);                 // Positionnement du servomoteur
+
+  // === Lecture et commande du servomoteur 2 ===
   v2l = analogRead(P2tPin);
   v2l = map(v2l, 0, 1023, 0, 180);
   m2servo.write(v2l);
 
+  // === Lecture et commande du servomoteur 3 ===
   v3l = analogRead(P3tPin);
   v3l = map(v3l, 0, 1023, 0, 180);
   m3servo.write(v3l);
 
-if (digitalRead(Button1Pin) == LOW) {
-  analogWrite(MotorINApin, 120);  // sens 1
-  analogWrite(MotorINBpin, 0);
-}
-else if (digitalRead(Button2Pin) == LOW) {
-  analogWrite(MotorINApin, 0);
-  analogWrite(MotorINBpin, 120);  // sens 2
-}
-else {
-  analogWrite(MotorINApin, 0);    // STOP
-  analogWrite(MotorINBpin, 0);    // STOP
-}
+  // === Commande du moteur DC avec boutons poussoirs ===
 
+  // Si le bouton 1 est appuyé → rotation dans le sens 1
+  if (digitalRead(Button1Pin) == LOW) {
+    analogWrite(MotorINApin, 120); // Vitesse moteur (PWM)
+    analogWrite(MotorINBpin, 0);
+  }
+
+  // Si le bouton 2 est appuyé → rotation dans le sens opposé
+  else if (digitalRead(Button2Pin) == LOW) {
+    analogWrite(MotorINApin, 0);
+    analogWrite(MotorINBpin, 120);
+  }
+
+  // Aucun bouton appuyé → arrêt du moteur
+  else {
+    analogWrite(MotorINApin, 0);
+    analogWrite(MotorINBpin, 0);
+  }
 }
